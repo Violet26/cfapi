@@ -403,7 +403,7 @@ class Event(db.Model):
         Organizations events from Meetup
     '''
     # Columns
-    id  = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Unicode(), primary_key=True)
     name = db.Column(db.Unicode())
     description = db.Column(db.Unicode())
     event_url = db.Column(db.Unicode())
@@ -418,8 +418,9 @@ class Event(db.Model):
     organization = db.relationship('Organization', single_parent=True, cascade='all, delete-orphan', backref=backref("events", cascade="save-update, delete")) #child
     organization_name = db.Column(db.Unicode(), db.ForeignKey('organization.name', ondelete='CASCADE'), nullable=False)
 
-    def __init__(self, name, event_url, start_time_notz, created_at, utc_offset,
+    def __init__(self, id, name, event_url, start_time_notz, created_at, utc_offset,
                  organization_name, location=None, end_time_notz=None, description=None):
+        self.id = id
         self.name = name
         self.description = description
         self.location = location
@@ -832,7 +833,7 @@ def get_issues_by_labels(labels):
     return jsonify(response)
 
 @app.route('/api/events')
-@app.route('/api/events/<int:id>')
+@app.route('/api/events/<id>')
 def get_events(id=None):
     ''' Regular response option for events.
     '''

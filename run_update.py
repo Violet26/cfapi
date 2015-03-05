@@ -92,7 +92,8 @@ def get_meetup_events(organization, group_urlname):
             results = got.json()['results']
             events = []
             for event in results:
-                event = dict(organization_name=organization.name,
+                event = dict(id=event['id'],
+                             organization_name=organization.name,
                              name=event['name'],
                              event_url=event['event_url'],
                              start_time_notz=format_date(event['time'], event['utc_offset']),
@@ -698,10 +699,9 @@ def save_event_info(session, event_dict):
         Save a dictionary of event into to the datastore session then return
         that event instance
     '''
-    # Select the current event, filtering on event_url and organization name.
-    filter = Event.event_url == event_dict['event_url'], \
-             Event.organization_name == event_dict['organization_name']
-    existing_event = session.query(Event).filter(*filter).first()
+    # Select the current event, filtering on event id.
+    filter = Event.id == event_dict['id']
+    existing_event = session.query(Event).filter(filter).first()
 
     # If this is a new event, save and return it.
     if not existing_event:
