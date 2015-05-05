@@ -1,0 +1,20 @@
+--
+-- Make new views of cfapi stats and numbers
+--
+DROP VIEW IF EXISTS total_orgs;
+CREATE VIEW total_orgs
+AS
+  SELECT COUNT(*) FROM organization AS total;
+COMMIT
+
+DROP VIEW IF EXISTS total_brigades;
+CREATE VIEW total_brigade
+AS
+  SELECT COUNT(*) FROM organization WHERE type ILIKE '%brigade%';
+COMMIT
+
+DROP VIEW IF EXISTS total_official_brigades;
+CREATE VIEW total_official_brigades
+AS
+  SELECT COUNT(*) FROM organization WHERE type ILIKE '%official%';
+COMMIT

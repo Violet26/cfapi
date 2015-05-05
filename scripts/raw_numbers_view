@@ -1,0 +1,43 @@
+AS total_brigades,
+SELECT COUNT(*) FROM organization WHERE type ILIKE '%official%' AS total_official_brigades,
+SELECT COUNT(*) FROM organization WHERE type ILIKE '%Code for All%' AS total_code_for_all,
+SELECT COUNT(*) FROM organization WHERE type ILIKE '%government%' AS total_governments,
+
+-- Projects
+SELECT COUNT(*) FROM project WHERE AS total_projects,
+SELECT COUNT(*) FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%brigade%') AS total_brigade_projects,
+SELECT COUNT(*) FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%official%') AS total_official_brigade_projects,
+SELECT COUNT(*) FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%Code for All%') AS total_cfall_projects,
+SELECT COUNT(*) FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%government%') AS toal_government_projects,
+
+-- Issues
+SELECT COUNT(*) FROM issue AS total_issues,
+SELECT COUNT(*) FROM issue WHERE project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%brigade%')) AS total_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%official%')) AS total_official_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%Code for All%')) AS total_cfall_issues,
+SELECT COUNT(*) FROM issue WHERE project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%government%')) AS total_government_issues,
+
+-- help wanted
+SELECT COUNT(*) FROM label WHERE name = 'help wanted' AS total_help_wanted_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'help wanted') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%brigade%')) AS total_help_wanted_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'help wanted') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%official%')) AS total_help_wanted_official_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'help wanted') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%Code for All%')) AS total_help_wanted_cfall_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'help wanted') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%government%')) AS total_help_wanted_government_issues,
+
+
+-- bug
+SELECT COUNT(*) FROM label WHERE name = 'bug' AS total_bug_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'bug') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%brigade%')) AS total_bug_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'bug') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%official%')) AS total_bug_official_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'bug') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%Code for All%')) AS total_bug_cfall_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'bug') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%government%')) AS total_bug_government_issues,
+
+-- enhancement
+SELECT COUNT(*) FROM label WHERE name = 'enhancement' AS total_enhancement_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'enhancement') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%brigade%')) AS total_enhancement_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'enhancement') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%official%')) AS total_enhancement_official_brigade_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'enhancement') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%Code for All%')) AS total_enhancement_cfall_issues,
+SELECT COUNT(*) FROM issue WHERE id IN (SELECT issue_id FROM label WHERE name = 'enhancement') AND project_id IN (SELECT id FROM project WHERE organization_name IN (SELECT name FROM organization WHERE type ILIKE '%government%')) AS total_enhancement_government_issues
+
+
+COMMIT;
