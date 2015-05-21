@@ -113,6 +113,7 @@ class Organization(db.Model):
     '''
     # Columns
     name = db.Column(db.Unicode(), primary_key=True)
+    logo = db.Column(db.Unicode())
     website = db.Column(db.Unicode())
     events_url = db.Column(db.Unicode())
     rss = db.Column(db.Unicode())
@@ -129,9 +130,10 @@ class Organization(db.Model):
     # Relationships
     # can contain events, stories, projects (these relationships are defined in the child objects)
 
-    def __init__(self, name, website=None, events_url=None,
+    def __init__(self, name, logo=None, website=None, events_url=None,
                  rss=None, projects_list_url=None, type=None, city=None, latitude=None, longitude=None, last_updated=time.time()):
         self.name = name
+        self.logo = logo
         self.website = website
         self.events_url = events_url
         self.rss = rss

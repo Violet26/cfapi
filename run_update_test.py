@@ -1352,5 +1352,20 @@ class RunUpdateTestCase(unittest.TestCase):
 
         self.results_state = 'before'
 
+
+    def test_logo_from_github(self):
+        ''' Test that we correctly pull in GitHub logos '''
+        with HTTMock(self.response_content):
+            import run_update
+            run_update.main(org_sources=run_update.TEST_ORG_SOURCES_FILENAME)
+
+        from app import Organization
+
+        orgs = self.db.session.query(Organization).all()
+
+        for org in orgs:
+            self.assertIsNotNone(org.logo)
+
+
 if __name__ == '__main__':
     unittest.main()

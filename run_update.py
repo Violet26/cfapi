@@ -39,6 +39,7 @@ GITHUB_USER_REPOS_API_URL = 'https://api.github.com/users/{username}/repos'
 GITHUB_REPOS_API_URL = 'https://api.github.com/repos{repo_path}'
 GITHUB_ISSUES_API_URL = 'https://api.github.com/repos{repo_path}/issues'
 GITHUB_CONTENT_API_URL = 'https://api.github.com/repos{repo_path}/contents/{file_path}'
+GITHUB_ORG_API_URL = 'https://api.github.com/users{orgname}'
 
 if 'GITHUB_TOKEN' in os.environ:
     github_auth = (os.environ['GITHUB_TOKEN'], '')
@@ -141,6 +142,22 @@ def get_organizations_from_spreadsheet(org_source):
                                      for (k, v) in org.items()])
 
     return organizations
+
+
+def get_logo(organization):
+    ''' Pull logo from input or GitHub '''
+    # If they link to a logo, use that
+    if organization.logo:
+        logo = organization.logo
+
+    # Else, try and get a logo from GitHub
+    elif organization.projects_list_url:
+        _, host, path, _, _, _ = urlparse(organization.projects_list_url)
+        if host in ('www.github.com', 'github.com'):
+            response = get_github_api(GITHUB_ORG_API_URL.format(orgname=path))
+            response = response.json()
+            organization.logo = response['avatar_url']
+
 
 def get_stories(organization):
     ''' Get two recent stories from an rss feed.
@@ -988,6 +1005,10 @@ def main(org_name=None, org_sources=None):
             organization_names.add(organization.name)
             # flush the organization
             db.session.flush()
+
+            if organization.logo or organization.projects_list_url:
+                logging.info("Gathering %s's logo." % organization.name)
+                get_logo(organization)
 
             if organization.rss or organization.website:
                 logging.info("Gathering all of %s's stories." % organization.name)
