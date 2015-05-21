@@ -39,7 +39,7 @@ GITHUB_USER_REPOS_API_URL = 'https://api.github.com/users/{username}/repos'
 GITHUB_REPOS_API_URL = 'https://api.github.com/repos{repo_path}'
 GITHUB_ISSUES_API_URL = 'https://api.github.com/repos{repo_path}/issues'
 GITHUB_CONTENT_API_URL = 'https://api.github.com/repos{repo_path}/contents/{file_path}'
-GITHUB_ORG_API_URL = 'https://api.github.com/users{orgname}'
+GITHUB_ORG_API_URL = 'https://api.github.com/orgs{orgname}'
 
 if 'GITHUB_TOKEN' in os.environ:
     github_auth = (os.environ['GITHUB_TOKEN'], '')
@@ -155,8 +155,13 @@ def get_logo(organization):
         _, host, path, _, _, _ = urlparse(organization.projects_list_url)
         if host in ('www.github.com', 'github.com'):
             response = get_github_api(GITHUB_ORG_API_URL.format(orgname=path))
-            response = response.json()
-            organization.logo = response['avatar_url']
+
+            # If we are github throttled this will fail
+            try:
+                response = response.json()
+                organization.logo = response['avatar_url']
+            except:
+                logging.error('Logo request didnt work')
 
 
 def get_stories(organization):

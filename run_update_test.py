@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
+
 import os
 import unittest
 import datetime
@@ -62,7 +63,7 @@ class RunUpdateTestCase(unittest.TestCase):
             count = 3
         # 'https://github.com/codeforamerica' and 'https://www.github.com/orgs/codeforamerica' are transformed
         #  to 'https://api.github.com/users/codeforamerica/repos' in run_update/get_projects()
-        lines = [u'''name,website,events_url,rss,projects_list_url'''.encode('utf8'), u'''Cöde for Ameriça,http://codeforamerica.org,http://www.meetup.com/events/Code-For-Charlotte/,http://www.codeforamerica.org/blog/feed/,http://example.com/cfa-projects.csv'''.encode('utf8'), u'''Code for America (2),,,,https://github.com/codeforamerica'''.encode('utf8'), u'''Code for America (3),,http://www.meetup.com/events/Code-For-Rhode-Island/,http://www.codeforamerica.org/blog/another/feed/,https://www.github.com/orgs/codeforamerica'''.encode('utf8')]
+        lines = [u'''name,logo,website,events_url,rss,projects_list_url'''.encode('utf8'), u'''Cöde for Ameriça,http://www.codeforamerica.org/media/images/logos/CfA_logo_lg.png,http://codeforamerica.org,http://www.meetup.com/events/Code-For-Charlotte/,http://www.codeforamerica.org/blog/feed/,http://example.com/cfa-projects.csv'''.encode('utf8'), u'''Code for America (2),,,,,https://github.com/codeforamerica'''.encode('utf8'), u'''Code for America (3),,,http://www.meetup.com/events/Code-For-Rhode-Island/,http://www.codeforamerica.org/blog/another/feed/,https://www.github.com/codeforamerica'''.encode('utf8')]
         return '\n'.join(lines[0:count + 1])
 
     def response_content(self, url, request):
@@ -181,6 +182,10 @@ class RunUpdateTestCase(unittest.TestCase):
         # csv of projects (austin)
         elif url.geturl() == 'http://openaustin.org/projects.csv':
             return response(200, '''name,description,link_url,code_url,type,categories,tags,status\nHack Task Aggregator,"Web application to aggregate tasks across projects that are identified for ""hacking"".",,,web service,"project management, civic hacking",,In Progress''', {'content-type': 'text/csv; charset=UTF-8'})
+
+        # github api result for cfa org
+        elif url.geturl() == 'https://api.github.com/orgs/codeforamerica':
+            return response(200, '''{"avatar_url": "https://avatars.githubusercontent.com/u/337792?v=3"}''')
 
         else:
             raise Exception('Asked for unknown URL ' + url.geturl())
@@ -1355,16 +1360,20 @@ class RunUpdateTestCase(unittest.TestCase):
 
     def test_logo_from_github(self):
         ''' Test that we correctly pull in GitHub logos '''
+        self.organization_count = 2
         with HTTMock(self.response_content):
             import run_update
             run_update.main(org_sources=run_update.TEST_ORG_SOURCES_FILENAME)
 
         from app import Organization
-
         orgs = self.db.session.query(Organization).all()
 
+        # Orgs come back in random order
         for org in orgs:
-            self.assertIsNotNone(org.logo)
+            if org.name == u'Cöde for Ameriça':
+                self.assertEqual(org.logo, 'http://www.codeforamerica.org/media/images/logos/CfA_logo_lg.png')
+            if org.name == 'Code for America (2)':
+                self.assertEqual(org.logo, 'https://avatars.githubusercontent.com/u/337792?v=3')
 
 
 if __name__ == '__main__':
