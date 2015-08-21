@@ -1086,6 +1086,45 @@ def get_projects(id=None):
     response = paged_results(query, int(request.args.get('page', 1)), int(request.args.get('per_page', 10)), querystring)
     return jsonify(response)
 
+
+@app.route('/api/projects/popular')
+def popular_projects():
+    ''' Surface popular projects '''
+
+    names = db.session.query(Project.name).group_by(Project.name).having(func.count(Project.name) >= 5).all()
+    popular_projects = []
+
+    for name in names:
+        # Get the orgs involved
+        projects = db.session.query(Project).filter(Project.name == name).all()
+        orgs = []
+        statuses = []
+        tags = []
+        for project in projects:
+            # Get the org name and link
+            org = db.session.query(Organization).filter(Organization.name == project.organization_name).first()
+            org = {
+                "name" : org.name,
+                "website" : org.website
+            }
+            orgs.append(org)
+            statuses.append(project.status)
+            tags.append(project.tags)
+        project = projects[0]
+        popular_project = {
+            "name" : project.name,
+            "description" : project.description,
+            "link_url" : project.link_url,
+            "code_url" : project.code_url,
+            "organizations" : orgs,
+            "statuses" : list(set(statuses)), # dedupe statuses
+            "tags" : list(set(tags)) # dedupe tags
+        }
+        popular_projects.append(popular_project)
+
+    return json.dumps(popular_projects)
+
+
 @app.route('/api/issues')
 @app.route('/api/issues/<int:id>')
 def get_issues(id=None):
