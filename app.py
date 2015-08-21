@@ -12,6 +12,7 @@ from mimetypes import guess_type
 from os.path import join
 from math import ceil
 from urllib import urlencode
+from operator import itemgetter
 
 from flask import Flask, make_response, request, jsonify, render_template
 import requests
@@ -1117,10 +1118,14 @@ def popular_projects():
             "link_url" : project.link_url,
             "code_url" : project.code_url,
             "organizations" : orgs,
+            "number_of_orgs" : len(orgs),
             "statuses" : list(set(statuses)), # dedupe statuses
             "tags" : list(set(tags)) # dedupe tags
         }
         popular_projects.append(popular_project)
+
+        # Sort by number of Brigades
+        popular_projects = sorted(popular_projects, key=itemgetter('number_of_orgs'), reverse=True)
 
     return json.dumps(popular_projects)
 
