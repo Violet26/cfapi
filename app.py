@@ -646,6 +646,11 @@ def paged_results(query, page, per_page, querystring=''):
     last, offset = page_info(query, page, per_page)
     if(querystring.find("only_ids") != -1):
         model_dicts = [o.id for o in query.limit(per_page).offset(offset)]
+    elif querystring.find("only_projects") != -1:
+        model_dicts = []
+        for o in query.limit(per_page).offset(offset):
+            obj = o.asdict(False,False)
+            model_dicts.append(obj)
     else:
         model_dicts = []
         for o in query.limit(per_page).offset(offset):
@@ -1059,6 +1064,8 @@ def get_projects(id=None):
                 ordering_filter_name = 'relevance'
         elif 'only_ids' in attr:
             query = query.with_entities(Project.id)
+        elif 'only_projects' in attr:
+            pass
         elif 'sort_by' in attr:
             if(value == 'relevance'):
                 ordering_filter_name = 'relevance'
