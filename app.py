@@ -230,6 +230,15 @@ def get_organizations_geojson():
     return jsonify(geojson)
 
 
+@app.route("/api/organizations/<orgid>/update")
+def update_org(orgid):
+    ''' Calls run_update on a specific org '''
+    import run_update
+    org_name = orgid.replace("-"," ")
+    run_update.main(org_name=org_name)
+    return make_response(jsonify({"message":"success"}),200)
+
+
 @app.route("/api/organizations/<organization_name>/events")
 def get_orgs_events(organization_name):
     '''
