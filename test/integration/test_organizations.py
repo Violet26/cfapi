@@ -667,6 +667,13 @@ class TestOrganizations(IntegrationTest):
         EventFactory(organization_name=cfsf.name, name=u'Kuumba', start_time_notz=datetime.now() + timedelta(2))
         db.session.commit()
 
+        # request all the organization's events
+        response = self.app.get('/api/organizations/code-for-san-francisco/events')
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertTrue('total' in response_data)
+        self.assertEqual(response_data['total'], 5)
+
         # request the organization's upcoming events
         response = self.app.get('/api/organizations/code-for-san-francisco/upcoming_events')
         self.assertEqual(response.status_code, 200)
