@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 import time
 
-from test.factories import OrganizationFactory, ProjectFactory, EventFactory, StoryFactory, IssueFactory, LabelFactory
+from test.factories import OrganizationFactory, ProjectFactory, EventFactory, StoryFactory, IssueFactory, LabelFactory, AttendanceFactory
 from test.harness import IntegrationTest
 from app import db
 
@@ -727,3 +727,14 @@ class TestOrganizations(IntegrationTest):
         response_data = json.loads(response.data)
         self.assertTrue('total' in response_data)
         self.assertEqual(response_data['total'], 3)
+
+        # add some attendance
+        AttendanceFactory(organization_name=cfsf.name)
+        db.session.commit()
+
+        response = self.app.get('/api/organizations/code-for-san-francisco/attendance')
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertTrue('total' in response_data)
+        self.assertTrue('organization_name' in response_data)
+        self.assertEqual(response_data['organization_name'], cfsf.name)
