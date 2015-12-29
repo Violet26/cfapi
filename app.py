@@ -287,7 +287,7 @@ def get_past_events(organization_name):
 def gather_orgs_rsvps(organization_name=None):
     ''' Orgs rsvps summarized '''
     # Check org name
-    organization = Organization.query.filter_by(name=raw_name(organization_name)).first()
+    organization = db.session.query(Organization).filter(func.lower(Organization.name) == func.lower(raw_name(organization_name))).first()
     if not organization:
         return "Organization not found", 404
     orgs_events = Event.query.filter(Event.organization_name == organization.name).all()
