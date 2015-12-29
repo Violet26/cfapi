@@ -242,7 +242,7 @@ def get_orgs_events(organization_name):
         Better than /api/events?q={"filters":[{"name":"organization_name","op":"eq","val":"Code for San Francisco"}]}
     '''
     # Check org name
-    organization = Organization.query.filter_by(name=raw_name(organization_name)).first()
+    organization = db.session.query(Organization).filter(func.lower(Organization.name) == func.lower(raw_name(organization_name))).first()
     if not organization:
         return "Organization not found", 404
 
