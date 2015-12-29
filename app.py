@@ -174,16 +174,16 @@ def build_rsvps_response(events):
 
 
 @app.route('/api/organizations')
-@app.route('/api/organizations/<name>')
-def get_organizations(name=None):
+@app.route('/api/organizations/<organization_name>')
+def get_organizations(organization_name=None):
     ''' Regular response option for organizations.
     '''
 
     filters, querystring = get_query_params(request.args)
 
-    if name:
+    if organization_name:
         # Get one named organization.
-        org_filter = Organization.name == raw_name(name)
+        org_filter = func.lower(Organization.name) == func.lower(raw_name(organization_name))
         org = db.session.query(Organization).filter(org_filter).first()
         if org:
             return jsonify(org.asdict(True))
