@@ -419,7 +419,7 @@ def get_orgs_attendance(organization_name):
     ''' A clean url to get an organizations attendance '''
 
     # Get one named organization.
-    organization = Organization.query.filter_by(name=raw_name(organization_name)).first()
+    organization = db.session.query(Organization).filter(func.lower(Organization.name) == func.lower(raw_name(organization_name))).first()
     if not organization:
         return "Organization not found", 404
 
