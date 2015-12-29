@@ -645,3 +645,15 @@ class TestOrganizations(IntegrationTest):
 
         # Test that only orgs with location data showed up
         self.assertEqual(len(response['features']),1)
+
+    def test_organization_parameters_case_insensitive(self):
+        ''' Parameters passed via the URL should be case-insensitive.
+        '''
+        OrganizationFactory(name=u'Code for San Francisco')
+        db.session.commit()
+
+        response = self.app.get('/api/organizations/code-for-san-francisco')
+        response_data = json.loads(response.data)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue('name' in response_data)
+        self.assertEqual(u'Code for San Francisco', response_data['name'])
