@@ -694,3 +694,13 @@ class TestOrganizations(IntegrationTest):
         response_data = json.loads(response.data)
         self.assertTrue('total' in response_data)
         self.assertEqual(response_data['total'], 3702)
+
+        # add a story
+        StoryFactory(organization_name=cfsf.name)
+        db.session.commit()
+
+        response = self.app.get('/api/organizations/code-for-san-francisco/stories')
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertTrue('total' in response_data)
+        self.assertEqual(response_data['total'], 1)
