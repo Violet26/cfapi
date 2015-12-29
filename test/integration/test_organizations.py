@@ -704,3 +704,14 @@ class TestOrganizations(IntegrationTest):
         response_data = json.loads(response.data)
         self.assertTrue('total' in response_data)
         self.assertEqual(response_data['total'], 1)
+
+        # add some projects
+        ProjectFactory(organization_name=cfsf.name, name=u'Mkeka')
+        ProjectFactory(organization_name=cfsf.name, name=u'Mahindi')
+        db.session.commit()
+
+        response = self.app.get('/api/organizations/code-for-san-francisco/projects')
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertTrue('total' in response_data)
+        self.assertEqual(response_data['total'], 2)
