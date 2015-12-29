@@ -258,7 +258,7 @@ def get_upcoming_events(organization_name):
         Get events that occur in the future. Order asc.
     '''
     # Check org name
-    organization = Organization.query.filter_by(name=raw_name(organization_name)).first()
+    organization = db.session.query(Organization).filter(func.lower(Organization.name) == func.lower(raw_name(organization_name))).first()
     if not organization:
         return "Organization not found", 404
     # Get upcoming event objects
