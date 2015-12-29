@@ -706,8 +706,8 @@ class TestOrganizations(IntegrationTest):
         self.assertEqual(response_data['total'], 1)
 
         # add some projects
-        ProjectFactory(organization_name=cfsf.name, name=u'Mkeka')
-        ProjectFactory(organization_name=cfsf.name, name=u'Mahindi')
+        project_mkeka = ProjectFactory(organization_name=cfsf.name, name=u'Mkeka')
+        project_mahindi = ProjectFactory(organization_name=cfsf.name, name=u'Mahindi')
         db.session.commit()
 
         response = self.app.get('/api/organizations/code-for-san-francisco/projects')
@@ -715,3 +715,15 @@ class TestOrganizations(IntegrationTest):
         response_data = json.loads(response.data)
         self.assertTrue('total' in response_data)
         self.assertEqual(response_data['total'], 2)
+
+        # add some issues
+        IssueFactory(project_id=project_mkeka.id, title=u'Mishumaa Saba')
+        IssueFactory(project_id=project_mkeka.id, title=u'Kikombe cha Umoja')
+        IssueFactory(project_id=project_mahindi.id, title=u'Zawadi')
+        db.session.commit()
+
+        response = self.app.get('/api/organizations/code-for-san-francisco/issues')
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertTrue('total' in response_data)
+        self.assertEqual(response_data['total'], 3)
