@@ -660,9 +660,11 @@ class TestOrganizations(IntegrationTest):
         self.assertEqual(u'Code for San Francisco', response_data['name'])
 
         # add some events
-        EventFactory(organization_name=cfsf.name, name=u'Umoja', start_time_notz=datetime.now() + timedelta(10))
-        EventFactory(organization_name=cfsf.name, name=u'Kujichagulia', start_time_notz=datetime.now() + timedelta(11))
-        EventFactory(organization_name=cfsf.name, name=u'Ujima', start_time_notz=datetime.now() + timedelta(12))
+        EventFactory(organization_name=cfsf.name, name=u'Umoja', start_time_notz=datetime.now() - timedelta(3))
+        EventFactory(organization_name=cfsf.name, name=u'Kujichagulia', start_time_notz=datetime.now() - timedelta(2))
+        EventFactory(organization_name=cfsf.name, name=u'Ujima', start_time_notz=datetime.now() - timedelta(1))
+        EventFactory(organization_name=cfsf.name, name=u'Nia', start_time_notz=datetime.now() + timedelta(1))
+        EventFactory(organization_name=cfsf.name, name=u'Kuumba', start_time_notz=datetime.now() + timedelta(2))
         db.session.commit()
 
         # request the organization's upcoming events
@@ -670,5 +672,11 @@ class TestOrganizations(IntegrationTest):
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.data)
         self.assertTrue('total' in response_data)
-        self.assertEqual(response_data['total'], 3)
+        self.assertEqual(response_data['total'], 2)
 
+        # request the organization's past events
+        response = self.app.get('/api/organizations/code-for-san-francisco/past_events')
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertTrue('total' in response_data)
+        self.assertEqual(response_data['total'], 3)
