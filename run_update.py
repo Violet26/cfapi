@@ -585,7 +585,10 @@ def update_project_info(project):
             # if values have changed, copy untouched values from the existing project object and return it
             if spreadsheet_is_updated or civic_json_is_updated:
                 logging.info('Project %s has been modified via spreadsheet or civic.json.', repo_url)
-                project['last_updated'] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %Z")
+                # if there are different values in a spreadsheet vs a civicjson
+                # they'll update every hour
+                # Removing this timestamp update fixes that
+                # project['last_updated'] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %Z")
                 project['github_details'] = existing_project.github_details
                 return project
 
