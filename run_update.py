@@ -421,24 +421,23 @@ def get_projects(organization):
 
 
 def github_latest_update_time(github_details):
-    ''' Issue 245 Choose most recent time for last_update from GitHub
-        * pushed_at: time of last commit
-        * updated_at: time of last repo object update
-        * If neither of the above exists log an error and use current time
+    ''' Use pushed_at as our measure of when a project was updated.
+        Too often a star or a follow would move a project to top of the list.
     '''
     import dateutil.parser
 
     datetime_format = '%a, %d %b %Y %H:%M:%S %Z'
 
     pushed_at = github_details['pushed_at'] if 'pushed_at' in github_details else None
-    updated_at = github_details['updated_at'] if 'updated_at' in github_details else None
+    created_at = github_details['created_at'] if 'created_at' in github_details else None
 
-    latest_date = max(pushed_at, updated_at)
+    # Use pushed_at first. Only use created_at if no commits.
+    latest_date = max(pushed_at, created_at)
 
     if (latest_date):
         return dateutil.parser.parse(latest_date).strftime(datetime_format)
     else:
-        logger.error("GitHub Project details has neither pushed_at or updated_at, using current time.")
+        logger.error("GitHub Project details has neither pushed_at or created_at, using current time.")
         return datetime.now().strftime(datetime_format)
 
 

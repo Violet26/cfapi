@@ -731,11 +731,11 @@ class RunUpdateTestCase(unittest.TestCase):
         # Test that latest date is given
         newer_time_from_github = u'2015-10-02T15:43:21Z'
         older_time_from_github = u'2015-10-02T15:43:20Z'
-        github_details = {'pushed_at': newer_time_from_github, 'updated_at': older_time_from_github}
+        github_details = {'pushed_at': newer_time_from_github, 'created_at': older_time_from_github}
         self.assertEqual(run_update.github_latest_update_time(github_details), dateutil.parser.parse(newer_time_from_github).strftime('%a, %d %b %Y %H:%M:%S %Z'))
 
         # Test handling of missing data
-        github_details = {'updated_at': older_time_from_github}
+        github_details = {'created_at': older_time_from_github}
         self.assertEqual(run_update.github_latest_update_time(github_details), dateutil.parser.parse(older_time_from_github).strftime('%a, %d %b %Y %H:%M:%S %Z'))
 
         github_details = {'pushed_at': newer_time_from_github}
