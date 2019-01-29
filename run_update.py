@@ -128,7 +128,11 @@ def format_date(time_in_milliseconds, utc_offset_msec):
 
 
 def format_location(venue):
+    if 'address_1' not in venue:
+        return venue['name']
+
     address = venue['address_1']
+
     if 'address_2' in venue and venue['address_2'] != '':
         address = address + ', ' + venue['address_2']
 
